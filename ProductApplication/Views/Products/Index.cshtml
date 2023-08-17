@@ -1,0 +1,33 @@
+﻿@model List<ProductApplication.Models.Product>
+
+@{
+    ViewData["Title"] = "Products";
+}
+
+<h1>Products</h1>
+<a asp-action="Create" class="btn btn-primary">Create Product</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Id</td>
+                <td>@product.Name</td>
+                <td>@product.Price</td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = product.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id = product.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = product.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
