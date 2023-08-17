@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProductApplication.Context;
 
@@ -10,9 +11,11 @@ using ProductApplication.Context;
 namespace ProductApplication.Migrations
 {
     [DbContext(typeof(EcommerceDbContext))]
-    partial class EcommerceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230817104609_desc-migration")]
+    partial class descmigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,28 +39,6 @@ namespace ProductApplication.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Category");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Sports"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Clothes"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Electronics"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Sweets"
-                        });
                 });
 
             modelBuilder.Entity("ProductApplication.Models.Customer", b =>
@@ -114,22 +95,6 @@ namespace ProductApplication.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CategoryId = 1,
-                            Name = "Product 1",
-                            Price = 100m
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CategoryId = 2,
-                            Name = "Product 2",
-                            Price = 200m
-                        });
                 });
 
             modelBuilder.Entity("ProductApplication.Models.Product", b =>
