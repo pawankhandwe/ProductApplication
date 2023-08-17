@@ -18,15 +18,68 @@ namespace ProductApplication.Controllers
         {
             _context = context;
         }
-
-        // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? categoryId, string sortOrder)
         {
-            var ecommerceDbContext = _context.Products.Include(p => p.Category);
-            return View(await ecommerceDbContext.ToListAsync());
+            var products = _context.Products.Include(p => p.Category).ToList();
+
+            if (categoryId.HasValue)
+            {
+                products = _context.Products.Where(p => p.CategoryId == categoryId.Value).ToList();
+            }
+            switch (sortOrder)
+            {
+                case "price_asc":
+                    products = _context.Products.OrderBy(p => p.Price).ToList();
+                    break;
+                case "price_desc":
+                    products = _context.Products.OrderByDescending(p => p.Price).ToList();
+                    break;
+                case "name_asc":
+                    products =_context.Products.OrderBy(p => p.Name).ToList();
+                    break;
+                case "name_desc":
+                    products = _context.Products.OrderByDescending(p => p.Name).ToList();
+                    break;
+                default:
+                    // Default sort order, if not specified
+                    products = _context.Products.OrderBy(p => p.Id).ToList();
+                    break;
+            }
+
+            ViewBag.Categories = new SelectList(_context.Category, "Id", "Name");
+          
+            return View(products);
         }
 
-        // GET: Products/Details/5
+        public IActionResult FilteredProducts(int category, string sortOrder)
+        {
+            var products = _context.Products.AsQueryable(); // Start with all products
+
+            if (category != 0) // Assuming 0 represents "All Categories"
+            {
+                products = products.Where(p => p.CategoryId == category);
+            }
+
+            // Apply sorting based on sortOrder parameter
+            if (sortOrder == "asc")
+            {
+                products = products.OrderBy(p => p.Name);
+            }
+            else if (sortOrder == "desc")
+            {
+                products = products.OrderByDescending(p => p.Name);
+            }else
+            {
+                products = products.OrderBy(p => p.Id);
+            }
+
+            // Convert the filtered and sorted products to a list and then to JSON
+            var filteredAndSortedProducts = products.ToList();
+            return Json(filteredAndSortedProducts);
+        }
+
+
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Products == null)

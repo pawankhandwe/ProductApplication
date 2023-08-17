@@ -3,10 +3,40 @@
 @{
     ViewData["Title"] = "Products";
 }
+<style>
+    .sort-link {
+        color: inherit; 
+        text-decoration: none;
+    }
+
+        .sort-link.active {
+            color: green;
+        }
+
+        .sort-link:hover {
+            color: red; 
+        }
+
+    }
+</style>
+   
+
 
 <h1>Products</h1>
 <a asp-action="Create" class="btn btn-primary">Create Product</a>
-<table class="table">
+<div>
+    Filter by Category: @Html.DropDownList("categoryId", ViewBag.Categories as SelectList, "All Categories", new { @id = "categoryDropdown" })
+</div>
+
+<div>
+    Sort by:
+    <a asp-action="Index" asp-route-sortOrder="price_asc" class="sort-link">Price (Ascending)</a> |
+    <a asp-action="Index" asp-route-sortOrder="price_desc" class="sort-link">Price (Descending)</a> |
+    <a asp-action="Index" asp-route-sortOrder="name_asc" class="sort-link">Name (Ascending)</a> |
+    <a asp-action="Index" asp-route-sortOrder="name_desc" class="sort-link">Name (Descending)</a>
+</div>
+
+<table  id="productTable" class="table">
     <thead>
         <tr>
             <th>Id</th>
@@ -31,3 +61,56 @@
         }
     </tbody>
 </table>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function filterAndSortProducts() {
+        var selectedCategory = $('#categoryDropdown').val();
+        console.log(selectedCategory);
+        // Get the selected category from the dropdown
+        var sortOrder = $('[data-sort-order].active').data('sort-order');
+        console.log(sortOrder);
+        $.ajax({
+            url: '@Url.Action("FilteredProducts", "Products")',
+            data: { category: selectedCategory, sortOrder: sortOrder }, // Pass selectedCategory instead of categoryKeyword
+            type: 'GET',
+            success: function (data) {
+               
+                    var tbody = $('#productTable tbody');
+                    tbody.empty();
+                    console.log(data);
+                    $.each(data, function (index, product) {
+                        var row = $('<tr>');
+                        row.append('<td>' + product.id + '</td>');
+                        row.append('<td>' + product.name + '</td>');
+                        row.append('<td>' + product.price + '</td>');
+                        row.append('<td>' +
+                            '<a href="/Products/Edit/' + product.Id + '">Edit</a> | ' +
+                            '<a href="/Products/Details/' + product.Id + '">Details</a> | ' +
+                            '<a href="/Products/Delete/' + product.Id + '">Delete</a>' +
+                            '</td>');
+
+                        tbody.append(row);
+                    });
+                
+               
+            }
+
+        });
+    }
+
+    // Bind onchange event to the category dropdown
+    $('#categoryDropdown').change(function () {
+        filterAndSortProducts();
+    });
+
+    // Bind click event to sorting links
+    $('[data-sort-order]').click(function (e) {
+        e.preventDefault();
+        $('[data-sort-order]').removeClass('active');
+        $(this).addClass('active');
+        filterAndSortProducts();
+    });
+   </script>
